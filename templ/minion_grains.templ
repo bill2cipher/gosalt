@@ -1,0 +1,4 @@
+grains:
+  {{ range $key, $val := .Property }}
+   {{$key}}: {{$val}}
+  {{ end }}

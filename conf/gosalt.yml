@@ -1,0 +1,17 @@
+basic:
+  code:  /root/p4/Programe/trunc/Server
+  servers: /etc/gosalt/servers.yml          # file contains server config
+
+log:
+  dir: logs
+  name: gosalt
+  maxBytes: 268435456 #256MB
+  level: debug
+
+release:
+  script: /etc/gosalt/release.sh
+  dir   : /var/gosalt/release
+
+conf:
+  templDir: /etc/gosalt/templ
+  

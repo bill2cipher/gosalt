@@ -1,0 +1,46 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;gosalt&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../dota_test" />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../dota_wechat" />
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://E:/go-workspace/src/sourcegraph.com" />
+      <root url="file://E:/go-workspace/src/G-game" />
+      <root url="file://E:/go-workspace/src/9fans.net" />
+      <root url="file://E:/go-workspace/src/golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../test" />
+      <root url="file://E:/go-workspace/src/github.com" />
+      <root url="file://$PROJECT_DIR$/../../../code.google.com" />
+      <root url="file://E:/go-workspace/src/test" />
+      <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../../G-game" />
+      <root url="file://$PROJECT_DIR$/../../../deploy" />
+      <root url="file://$PROJECT_DIR$/../../../rsc.io" />
+      <root url="file://$PROJECT_DIR$/../../../google.golang.org" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../dota_test" />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../dota_wechat" />
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://E:/go-workspace/src/sourcegraph.com" />
+      <root url="file://E:/go-workspace/src/G-game" />
+      <root url="file://E:/go-workspace/src/9fans.net" />
+      <root url="file://E:/go-workspace/src/golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../test" />
+      <root url="file://E:/go-workspace/src/github.com" />
+      <root url="file://$PROJECT_DIR$/../../../code.google.com" />
+      <root url="file://E:/go-workspace/src/test" />
+      <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../../G-game" />
+      <root url="file://$PROJECT_DIR$/../../../deploy" />
+      <root url="file://$PROJECT_DIR$/../../../rsc.io" />
+      <root url="file://$PROJECT_DIR$/../../../google.golang.org" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
