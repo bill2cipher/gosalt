@@ -1,13 +1,14 @@
-package manager
+package models
 
 import (
-	"fmt"
+	log "github.com/Sirupsen/logrus"
+	. "github.com/jellybean4/gosalt/conf"
 	"github.com/jellybean4/gosalt/db"
 	"github.com/jellybean4/gosalt/util"
 )
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
 )
 
 var Servers map[string]Server
@@ -43,14 +44,14 @@ func init() {
 }
 
 func AddServer(svrData string) (*Server, error) {
-  svr := new(Server)
-  if err := util.Unmarshal(svrData, svr); err != nil {
-    log.WithFields(log.Fields{
-      "data": svrData,
-      "reason": err.Error(),
-    }).Error("unmarshal server data failed")
-    return nil, err
-  } else if db.Set(db.SERVER_TABLE, []byte(name), svrData); err != nil {
+	svr := new(Server)
+	if err := util.Unmarshal(svrData, svr); err != nil {
+		log.WithFields(log.Fields{
+			"data":   svrData,
+			"reason": err.Error(),
+		}).Error("unmarshal server data failed")
+		return nil, err
+	} else if db.Set(db.SERVER_TABLE, []byte(svr.Name), svrData); err != nil {
 		return nil, err
 	} else {
 		Servers[svr.Name] = svr
@@ -68,11 +69,13 @@ func DelServer(name string) error {
 }
 
 // InitConfig is used to init the server's salt minion config
-func (svr *Server) InitConfig() {
-  cmd := ""
+func (svr *Server) InitConfig(args ...string) {
+	initScript := Conf.RootDir + "/" + Conf.InitScript
+	util.ExecScript(initScript, args)
 }
 
 // SyncConfig is used to sync config info into minion
-func (svr *Server) SyncConfig() {
-
+func (svr *Server) SyncConfig(args ...string) {
+	syncScript := Conf.RootDir + "/" + Conf.SyncScript
+	util.ExecScript(syncScript, args)
 }

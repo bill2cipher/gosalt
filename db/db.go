@@ -5,9 +5,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
-)
-import (
-	. "github.com/jellybean4/gosalt/conf"
+  "github.com/spf13/viper"
+  "github.com/jellybean4/gosalt/util"
 )
 
 // db is used to store dev info
@@ -15,14 +14,15 @@ var gosaltdb *bolt.DB
 
 func init() {
 	options := &bolt.Options{Timeout: 1 * time.Second}
-	if db, err := bolt.Open(Conf.DBFile, 0600, options); err != nil {
+  dbFile := viper.GetString(util.DB_FILE)
+	if db, err := bolt.Open(dbFile, 0600, options); err != nil {
 		log.WithFields(log.Fields{
-			"dbfile": Conf.DBFile,
+			"dbfile": dbFile,
 			"reason": err.Error(),
 		}).Fatal("open dbfile failed")
 	} else {
 		log.WithFields(log.Fields{
-			"dbfile": Conf.DBFile,
+			"dbfile": dbFile,
 		}).Info("open dbfile success")
 		gosaltdb = db
 	}
@@ -30,7 +30,7 @@ func init() {
 }
 
 func createTables() {
-	for tb := range Tables {
+	for tb := range TABLES {
 		err := gosaltdb.Update(func(tx *bolt.Tx) error {
 			if _, err := tx.CreateBucketIfNotExists([]byte(tb)); err != nil {
 				return err

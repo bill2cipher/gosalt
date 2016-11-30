@@ -16,10 +16,14 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+)
+
+import (
+  "github.com/jellybean4/gosalt/util"
 )
 
 var cfgFile string
@@ -27,16 +31,9 @@ var cfgFile string
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "gosalt",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-// Uncomment the following line if your bare application
-// has an action associated with it:
-//	Run: func(cmd *cobra.Command, args []string) { },
+	Short: "gosalt is a tool used to deploy and config servers with saltstack",
+	Long: `saltstack is a great tool for server manage, but to make it easy for
+use, here's gosalt`,
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -50,29 +47,43 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
-
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gosalt.yaml)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is /etc/gosalt/gosalt.yml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+  setDefault() // set default config for gosalt
+
 	if cfgFile != "" { // enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".gosalt") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.SetConfigName("gosalt")      // name of config file (without extension)
+	viper.AddConfigPath("/etc/gosalt") // adding home directory as first search path
+	viper.AutomaticEnv()               // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		log.WithFields(log.Fields{
+			"config": viper.ConfigFileUsed(),
+			"reason": err.Error(),
+		}).Fatal("parse config file failed")
+	} else {
+		log.WithFields(log.Fields{
+			"config": viper.ConfigFileUsed(),
+		}).Info("parse config file success")
 	}
+}
+
+
+func setDefault() {
+  viper.SetDefault(util.ROOT_DIR, "/etc/gosalt/")
+  viper.SetDefault(util.CODE_DIR, "/root/p4/Programe/trunc/Server/")
+  viper.SetDefault(util.RELEASE_DIR, "/var/gosalt/release/")
+  viper.SetDefault(util.DB_FILE, "/var/gosalt/gosaltdb")
+
+  viper.SetDefault(util.RELEASE_SCRIPT, "/etc/gosalt/script/release.sh")
+  viper.SetDefault(util.INIT_SCRIPT, "/etc/gosalt/script/init.sh")
+  viper.SetDefault(util.SYNC_SCRIPT, "/etc/gosalt/script/sync.sh")
+  viper.SetDefault(util.DEPLOY_SCRIPT, "/etc/gosalt/script/deploy.sh")
 }
