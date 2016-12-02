@@ -15,12 +15,11 @@ import (
  * 3. release dir
  * 4. server types
  */
-func Release(version string, types ...string) {
+func Release(version string, types ...string) *util.ExecResult {
   args := []string{viper.GetString(util.CODE_DIR), version,
-      viper.GetString(util.RELEASE_DIR)}
+    viper.GetString(util.RELEASE_DIR)}
   args = append(args, types...)
   releaseScript := viper.GetString(util.ROOT_DIR) + "/" +
       viper.GetString(util.RELEASE_SCRIPT)
-
-  util.ExecScript(releaseScript, args...)
+  return util.ExecScript(releaseScript, args...)
 }

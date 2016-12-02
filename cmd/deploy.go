@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
+  "github.com/spf13/cobra"
   log "github.com/Sirupsen/logrus"
   . "github.com/jellybean4/gosalt/deploy"
 )
@@ -27,14 +27,14 @@ var (
 
 // deployCmd represents the deploy command
 var deployCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "deploy binary into specific servers",
-	Long:  `deploy binary into servers`,
-	Run:   deploy_runner,
+  Use:   "deploy",
+  Short: "deploy binary into specific servers",
+  Long:  `deploy binary into servers`,
+  Run:   deploy_runner,
 }
 
 func init() {
-	RootCmd.AddCommand(deployCmd)
+  RootCmd.AddCommand(deployCmd)
 
   deployCmd.Flags().StringVar(&deploy_version, "version", "trunk", "code version to deploy to servers (default is trunk)")
   deployCmd.Flags().StringVar(&deploy_version, "servers", "", "server to deploy on (default is empty)")

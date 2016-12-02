@@ -1,4 +1,4 @@
-// Copyright © 2016 jellybean4
+// Copyright © 2016 NAME HERE <EMAIL ADDRESS>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
 import (
-  log "github.com/Sirupsen/logrus"
-  "github.com/jellybean4/gosalt/cmd"
+  "github.com/spf13/cobra"
+  . "github.com/jellybean4/gosalt/web"
 )
 
-func init() {
-  log.SetFormatter(&log.JSONFormatter{})
-  log.SetLevel(log.WarnLevel)
+var (
+  start_port int
+)
+
+// startCmd represents the start command
+var startCmd = &cobra.Command{
+  Use:   "start",
+  Short: "start gosalt as a standalone web server",
+  Long: `start gosalt as a standalone web server`,
+  Run: start_runner,
 }
 
-func main() {
-  cmd.Execute()
+func init() {
+  RootCmd.AddCommand(startCmd)
+
+  startCmd.Flags().IntVar(&start_port, "port", 5505, "port to listen to")
+}
+
+func start_runner(cmd *cobra.Command, args []string) {
+  Serve(start_port)
 }

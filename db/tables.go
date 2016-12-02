@@ -1,8 +1,8 @@
 package db
-const (
-  SERVER_TABLE = []byte("server")
-)
 
 var (
-  TABLES = []string{SERVER_TABLE}
+  SERVER_TABLE = []byte("server")
+  TEMPLATE_TABLE = []byte("template")
+
+  TABLES = [][]byte{SERVER_TABLE, TEMPLATE_TABLE}
 )

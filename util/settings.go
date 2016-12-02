@@ -1,13 +1,14 @@
 package util
 
 const (
-	ROOT_DIR    = "root_dir"
-	CODE_DIR    = "code_dir"
-	RELEASE_DIR = "release_dir"
-	DB_FILE     = "DB_FILE"
+  ROOT_DIR = "basic.root_dir"
+  CODE_DIR = "basic.code_dir"
+  DB_FILE = "db.file"
+  WEB_DIR = "web.dir"
 
-	RELEASE_SCRIPT = "release_script"
-	DEPLOY_SCRIPT  = "deploy_script"
-	INIT_SCRIPT    = "init_script"
-	SYNC_SCRIPT    = "sync_script"
+  RELEASE_DIR = "release.dir"
+  RELEASE_SCRIPT = "release.script"
+  DEPLOY_SCRIPT = "deploy.deploy_script"
+  INIT_SCRIPT = "deploy.init_script"
+  SYNC_SCRIPT = "deploy.sync_script"
 )

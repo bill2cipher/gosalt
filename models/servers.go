@@ -1,81 +1,75 @@
 package models
 
 import (
-	log "github.com/Sirupsen/logrus"
-	. "github.com/jellybean4/gosalt/conf"
-	"github.com/jellybean4/gosalt/db"
-	"github.com/jellybean4/gosalt/util"
+  "github.com/jellybean4/gosalt/db"
+  "github.com/jellybean4/gosalt/util"
+  log "github.com/Sirupsen/logrus"
+  "github.com/spf13/viper"
 )
 
-import (
-	"fmt"
+var (
+  ServerCache *Cache
 )
-
-var Servers map[string]Server
-
-const (
-	SVR_PROP_TYPE = "type"
-)
-
-type Server struct {
-	Name     string            `json:"name"`
-	IPAddr   string            `json:"ipaddr"`
-	SshPort  int               `json:"sshport"`
-	UserName string            `json:"username"`
-	Passwd   string            `json:"passwd"`
-	Property map[string]string `json:"property"`
-}
 
 func init() {
-	if datas, err := db.All(db.SERVER_TABLE); err != nil {
-		mesg := fmt.Sprintf("load server data failed, reason %s", err.Error())
-		panic(mesg)
-	} else {
-		for data := range datas {
-			svr := new(Server)
-			if err := util.Unmarshal(data, svr); err != nil {
-				mesg := fmt.Sprintf("unmarshal server data %v failed, reason %s", data, err.Error())
-				panic(mesg)
-			} else {
-				Servers[svr.Name] = svr
-			}
-		}
-	}
+  ServerCache = NewServerCache()
 }
 
-func AddServer(svrData string) (*Server, error) {
-	svr := new(Server)
-	if err := util.Unmarshal(svrData, svr); err != nil {
-		log.WithFields(log.Fields{
-			"data":   svrData,
-			"reason": err.Error(),
-		}).Error("unmarshal server data failed")
-		return nil, err
-	} else if db.Set(db.SERVER_TABLE, []byte(svr.Name), svrData); err != nil {
-		return nil, err
-	} else {
-		Servers[svr.Name] = svr
-		return svr, nil
-	}
+type (
+  Server struct {
+    Name     string            `json:"name"`
+    IPAddr   string            `json:"ipaddr"`
+    SshPort  int               `json:"sshport"`
+    UserName string            `json:"username"`
+    Passwd   string            `json:"passwd"`
+    Property map[string]string `json:"property"`
+  }
+
+  ServerHandler struct {
+    *DefaultHandler
+  }
+)
+
+func (h *ServerHandler) Unmarshal(data []byte) (interface{}, error) {
+  v := new(Server)
+  if err := util.Unmarshal(data, v); err != nil {
+    log.WithFields(log.Fields{
+      "data": data,
+      "reason": err.Error(),
+    }).Error("unmarshal data failed")
+    return nil, err
+  } else {
+    return v, nil
+  }
 }
 
-func DelServer(name string) error {
-	if err := db.Unset(db.SERVER_TABLE, []byte(name)); err != nil {
-		return err
-	} else {
-		delete(Servers, name)
-		return nil
-	}
+func (h *ServerHandler) Key(value interface{}) (string, bool) {
+  if s, ok := value.(*Server); ok {
+    log.WithFields(log.Fields{
+      "value": value,
+      "type": "server",
+    }).Error("type assert failed")
+    return s.Name, true
+  } else {
+    return "", false
+  }
+}
+
+func NewServerCache() *Cache {
+  dftHandler := &DefaultHandler{table : db.SERVER_TABLE}
+  svrHandler := &ServerHandler{DefaultHandler: dftHandler}
+  c := NewCache(string(db.SERVER_TABLE), svrHandler, true, false)
+  return c
 }
 
 // InitConfig is used to init the server's salt minion config
-func (svr *Server) InitConfig(args ...string) {
-	initScript := Conf.RootDir + "/" + Conf.InitScript
-	util.ExecScript(initScript, args)
+func (svr *Server) InitConfig(args ...string) *util.ExecResult {
+  initScript := viper.GetString(util.ROOT_DIR) + "/" + viper.GetString(util.INIT_SCRIPT)
+  return util.ExecScript(initScript, args)
 }
 
 // SyncConfig is used to sync config info into minion
-func (svr *Server) SyncConfig(args ...string) {
-	syncScript := Conf.RootDir + "/" + Conf.SyncScript
-	util.ExecScript(syncScript, args)
+func (svr *Server) SyncConfig(args ...string) *util.ExecResult {
+  syncScript := viper.GetString(util.ROOT_DIR) + "/" + viper.GetString(util.SYNC_SCRIPT)
+  return util.ExecScript(syncScript, args)
 }
