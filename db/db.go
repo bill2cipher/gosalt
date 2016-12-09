@@ -1,113 +1,157 @@
 package db
 
 import (
-  "time"
-
-  log "github.com/Sirupsen/logrus"
-  "github.com/boltdb/bolt"
-  "github.com/spf13/viper"
-  "github.com/jellybean4/gosalt/util"
+	log "github.com/Sirupsen/logrus"
+	"github.com/jellybean4/gosalt/util"
 )
 
-// db is used to store dev info
-var gosaltdb *bolt.DB
+import (
+	"gopkg.in/mgo.v2"
+	"reflect"
+  "time"
+)
 
-func init() {
-  options := &bolt.Options{Timeout: 1 * time.Second}
-  dbFile := viper.GetString(util.DB_FILE)
-  if db, err := bolt.Open(dbFile, 0600, options); err != nil {
-    log.WithFields(log.Fields{
-      "dbfile": dbFile,
-      "reason": err.Error(),
-    }).Fatal("open dbfile failed")
-  } else {
-    log.WithFields(log.Fields{
-      "dbfile": dbFile,
-    }).Info("open dbfile success")
-    gosaltdb = db
+const (
+	EMPTY_ID = "empty"
+)
+
+func getCollection(table string) (*mgo.Collection, error) {
+  info := &mgo.DialInfo{
+    Addrs:    []string{util.GetConfig(util.DB_HOST)},
+    Timeout:  6 * time.Second,
+    Database: util.GetConfig(util.DB_NAME),
+    Username: util.GetConfig(util.DB_USER),
+    Password: util.GetConfig(util.DB_PASS),
   }
-  createTables()
+
+	sess, err := mgo.DialWithInfo(info)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"info":   info,
+			"reason": err.Error(),
+		}).Fatal(util.DB_CONN_LOG)
+		return nil, err
+	}
+	sess.SetMode(mgo.Monotonic, true)
+	return sess.DB(util.GetConfig(util.DB_NAME)).C(table), nil
 }
 
-func createTables() {
-  for _, tb := range TABLES {
-    err := gosaltdb.Update(func(tx *bolt.Tx) error {
-      if _, err := tx.CreateBucketIfNotExists(tb); err != nil {
-        return err
-      }
-      return nil
-    })
-    if err != nil {
-      log.WithFields(log.Fields{
-        "table":  tb,
-        "reason": err.Error(),
-      }).Fatal("create table failed")
-    }
-  }
+func Get(table string, key string, t reflect.Type) (interface{}, error) {
+	coll, err := getCollection(table)
+	if err != nil {
+		return nil, err
+	}
+	value := reflect.New(t).Interface()
+	if err := coll.FindId(key).One(value); err != nil {
+		log.WithFields(log.Fields{
+			"table":  table,
+			"key":    key,
+			"reason": err.Error(),
+		}).Error(util.DB_FETCH_LOG)
+		return nil, err
+	} else {
+		return value, nil
+	}
 }
 
-func Get(table []byte, key []byte) ([]byte, error) {
-  var data []byte
-  err := gosaltdb.View(func(tx *bolt.Tx) error {
-    b := tx.Bucket(table)
-    data = b.Get(key)
-    return nil
-  })
-  if err != nil {
-    log.WithFields(log.Fields{
-      "table":  table,
-      "key":    key,
-      "reason": err.Error(),
-    }).Error("db fetch data failed")
-  }
-  return data, err
+func Set(table string, key string, value interface{}) error {
+	coll, err := getCollection(table)
+	if err != nil {
+		return err
+	}
+
+	if key == EMPTY_ID {
+		if err := coll.Insert(value); err != nil {
+			log.WithFields(log.Fields{
+				"table":  table,
+				"key":    key,
+				"value":  value,
+				"reason": err.Error(),
+			}).Error(util.DB_STORE_LOG)
+			return err
+		} else {
+			return nil
+		}
+	}
+
+	if err := coll.UpdateId(key, value); err != nil {
+		log.WithFields(log.Fields{
+			"table":  table,
+			"key":    key,
+			"value":  value,
+			"reason": err.Error(),
+		}).Error(util.DB_STORE_LOG)
+		return err
+	} else {
+		log.WithFields(log.Fields{
+			"table": table,
+			"key":   key,
+			"value": value,
+		}).Info("db store success")
+		return nil
+	}
 }
 
-func Set(table []byte, key []byte, value []byte) error {
-  err := gosaltdb.Update(func(tx *bolt.Tx) error {
-    b := tx.Bucket(table)
-    return b.Put(key, value)
-  })
-  if err != nil {
-    log.WithFields(log.Fields{
-      "table":  table,
-      "key":    key,
-      "value":  value,
-      "reason": err.Error(),
-    }).Error("store value to db failed")
-  }
-  return err
+func Unset(table, key string) error {
+	coll, err := getCollection(table)
+	if err != nil {
+		return err
+	}
+
+	if err := coll.RemoveId(key); err != nil {
+		log.WithFields(log.Fields{
+			"table":  table,
+			"key":    key,
+			"reason": err.Error(),
+		}).Error(util.DB_DELETE_LOG)
+		return err
+	} else {
+		log.WithFields(log.Fields{
+			"table": table,
+			"key":   key,
+		}).Info("db delete success")
+		return nil
+	}
 }
 
-func Unset(table []byte, key []byte) error {
-  err := gosaltdb.Update(func(tx *bolt.Tx) error {
-    b := tx.Bucket(table)
-    return b.Delete(key)
-  })
-  if err != nil {
-    log.WithFields(log.Fields{
-      "table":  table,
-      "key":    key,
-      "reason": err.Error(),
-    }).Error("delete db data failed")
-  }
-  return err
-}
+func All(table string, t reflect.Type) ([]interface{}, error) {
+	coll, err := getCollection(table)
+	if err != nil {
+		return nil, err
+	}
 
-func All(table []byte) ([][]byte, error) {
-  var datas [][]byte
-  err := gosaltdb.View(func(tx *bolt.Tx) error {
-    b := tx.Bucket(table)
-    return b.ForEach(func(k, v []byte) error {
-      datas = append(datas, v)
-      return nil
-    })
-  })
-  if err != nil {
-    log.WithFields(log.Fields{
-      "table":  table,
-      "reason": err.Error(),
-    }).Error("fetch all db data failed")
-  }
-  return datas, err
+	query := coll.Find(nil)
+	iter := query.Iter()
+	cnt, err := query.Count()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"table":  table,
+			"reason": err.Error(),
+		}).Error(util.DB_FETCH_LOG)
+		return nil, err
+	}
+	result, i := make([]interface{}, cnt), 0
+
+	for i < cnt {
+		value := reflect.New(t)
+		if !iter.Next(value) {
+			break
+		}
+		result[i] = value
+		i++
+	}
+
+	if i != cnt {
+		result = result[0:i]
+	}
+
+	if err := iter.Close(); err != nil {
+		log.WithFields(log.Fields{
+			"table":  table,
+			"reason": err.Error(),
+		}).Error(util.DB_FETCH_LOG)
+		return nil, err
+	} else {
+		return result, nil
+	}
 }

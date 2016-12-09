@@ -17,7 +17,7 @@ package cmd
 import (
   "github.com/spf13/cobra"
   log "github.com/Sirupsen/logrus"
-  . "github.com/jellybean4/gosalt/deploy"
+  . "github.com/jellybean4/gosalt/module"
 )
 
 var (

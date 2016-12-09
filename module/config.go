@@ -1,4 +1,4 @@
-package conf
+package module
 
 import (
   log "github.com/Sirupsen/logrus"
@@ -8,13 +8,13 @@ import (
 )
 
 func Add(svr *models.Server) error {
-  if err := models.ServerCache.Set(svr.Name, svr); err != nil {
-    return err
-  } else if rslt := svr.InitConfig(); rslt.Error != nil {
-    return rslt.Error
-  } else if rslt := svr.SyncConfig(); rslt.Error != nil {
-    return rslt.Error
-  }
+  //if err := models.ServerCache.Set(svr.Name, svr); err != nil {
+  //  return err
+  //} else if rslt := svr.InitConfig(); rslt.Error != nil {
+  //  return rslt.Error
+  //} else if rslt := svr.SyncConfig(); rslt.Error != nil {
+  //  return rslt.Error
+  //}
   return nil
 }
 

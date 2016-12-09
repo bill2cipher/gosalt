@@ -9,7 +9,7 @@ import (
   log "github.com/Sirupsen/logrus"
   . "github.com/jellybean4/gosalt/mesg"
   "github.com/jellybean4/gosalt/util"
-  "github.com/jellybean4/gosalt/deploy"
+  "github.com/jellybean4/gosalt/module"
 )
 
 func Deploy(c *gin.Context) {
@@ -18,17 +18,17 @@ func Deploy(c *gin.Context) {
     log.WithFields(log.Fields{
       "action": "deploy",
       "reason": err.Error(),
-    }).Error("read request deploy data failed")
-    rep.Code = 1
+    }).Error(util.GIN_PARSE_REQUEST_LOG)
+    rep.Code = util.GIN_PARSE_REQUEST_CODE
     rep.Mesg = err.Error()
-  } else if result := deploy.Deploy(req.Version, req.Server); result.Error != nil {
+  } else if result := module.Deploy(req.Version, req.Server); result.Error != nil {
     log.WithFields(log.Fields{
       "action": "deploy",
       "request": req,
       "reason": result.Error.Error(),
       "stderr": result.Stderr.String(),
-    }).Error("execute deploy failed")
-    rep.Code = 2
+    }).Error(util.SCRIPT_EXECUTE_LOG)
+    rep.Code = util.SCRIPT_EXECUTE_CODE
     rep.Mesg = err.Error()
   } else {
     log.WithFields(log.Fields{
@@ -36,8 +36,8 @@ func Deploy(c *gin.Context) {
       "request": req,
       "stdout": result.Stdout.String(),
     }).Info("execute deploy success")
-    rep.Code = 0
-    rep.Mesg = ""
+    rep.Code = util.SUCCESS_CODE
+    rep.Mesg = util.SUCCESS_MESG
   }
   c.JSON(http.StatusOK, rep)
 }

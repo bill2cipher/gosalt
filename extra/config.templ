@@ -1,0 +1,3 @@
+{{ range $k, $v := range .Config }}
+  {{printf "%s = salt['pillar.get']('%s', '%s')" $k $k $v }}
+{{ end }}

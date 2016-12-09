@@ -9,8 +9,6 @@ import (
   . "github.com/jellybean4/gosalt/web/controller"
   "github.com/jellybean4/gosalt/util"
   "github.com/spf13/viper"
-  "github.com/jellybean4/gosalt/release"
-  "github.com/jellybean4/gosalt/deploy"
 )
 
 func Serve(port int) {
@@ -34,9 +32,9 @@ func static(webDir string, router *gin.Engine) {
 
 func routes(webDir string, router *gin.Engine) {
   router.StaticFile("index.html", webDir + "/index.html")
-  release := router.Group("/new")
+  release := router.Group("/release")
   {
-    release.POST("/add", Release)
+    release.POST("/do", Release)
   }
 
   deploy := router.Group("/deploy")

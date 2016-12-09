@@ -10,14 +10,14 @@ import (
 )
 
 func TestDeploy(t *testing.T) {
-  initServer(t)
+  startServer(t)
 
   reqStruct := &DeployReq{
     Version: "trunk",
     Server:  "*",
   }
 
-  data, repStruct := request(t, reqStruct, "action/deploy"), &DeployRep{}
+  data, repStruct := request(t, reqStruct, "deploy/do"), &DeployRep{}
   if err := json.Unmarshal(data, repStruct); err != nil {
     t.Errorf("parse deploy response failed, reason %s", err.Error())
   }

@@ -16,7 +16,7 @@ package cmd
 
 import (
   log "github.com/Sirupsen/logrus"
-  . "github.com/jellybean4/gosalt/release"
+  . "github.com/jellybean4/gosalt/module"
   "github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ last arguments passed to release script`,
   Run: release_runner,
 }
 
-func init() {
+func initRelease() {
   RootCmd.AddCommand(releaseCmd)
   releaseCmd.Flags().StringVar(&release_version, "version", "trunk", "code version to release (default is trunk)")
   releaseCmd.Flags().StringSliceVar(&release_types, "types", []string{"all"}, "types to release (default is all)")

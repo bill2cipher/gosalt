@@ -1,5 +1,7 @@
 package mesg
 
+import "github.com/jellybean4/gosalt/models"
+
 type Result struct {
 	Code int    `json:"code"`
 	Mesg string `json:"mesg"`
@@ -30,8 +32,7 @@ type (
 
 type (
 	SetTemplateReq struct {
-		Name   string            `json:"name"`
-		Config map[string]string `json:"config"`
+		models.Template
 	}
 
 	SetTemplateRep struct {
@@ -44,8 +45,7 @@ type (
 
 	GetTemplateRep struct {
 		Result
-		Name   string            `json:"name"`
-		Config map[string]string `json:"config"`
+		models.Template
 	}
 
 	DelTemplateReq struct {

@@ -31,9 +31,8 @@ var startCmd = &cobra.Command{
   Run: start_runner,
 }
 
-func init() {
+func initStart() {
   RootCmd.AddCommand(startCmd)
-
   startCmd.Flags().IntVar(&start_port, "port", 5505, "port to listen to")
 }
 

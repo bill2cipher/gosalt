@@ -1,0 +1,43 @@
+This file describes gosalt's file structure.
+
+/                 // defined in root_dir, root of gosalt files
+|
+|---- /etc/gosalt     // dir contains gosalt resource files
+|          |
+|          |---- web  //  dir contains web ui fiiles
+|          |
+|          |---- minion // dir contains saltstack minion related files, like minion config
+|          |
+|          |---- template // dir contains server config template
+|          |        |
+|          |        |---- dev  // dir store develop config template files, dev is the same struct as prod
+|          |        |
+|          |        |---- prod // dir store production config template files
+|          |                |
+|          |                |---- v1 // dir store diff version config template files
+|          |                |
+|          |                |---- v2
+|          |
+|          |---- script // dir contains script used to do exactly work
+|          |        |
+|          |        |---- release.sh
+|          |        |---- sync.sh
+|          |        |---- init.sh
+|          |        |---- deploy.sh
+|          |
+|          |---- db     // dir contains db file
+|
+|---- /var/log  // dir containts generated files
+         |
+         |---- logs // dir contains gosalt logs
+         |
+         |---- release // dir contains generated release files
+                  |
+                  |---- dev  // dir contains develop release files
+                  |
+                  |---- prod // dir contains production release files
+                          |
+                          |---- v1 // dir contains prod version 'v1' release files
+                          |
+                          |---- v2 // dir contains prod version 'v2' release files
+

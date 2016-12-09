@@ -6,10 +6,15 @@ import (
   "os/exec"
   "errors"
   "net/http"
+  "os"
+  "fmt"
 )
 
+
 // Diec is used to indicate the exiting of gosalt server
-var Diec chan *struct{}
+var (
+  Diec chan *struct{}
+)
 
 type ExecResult struct {
   Error  error
@@ -19,7 +24,7 @@ type ExecResult struct {
   Stderr *bytes.Buffer
 }
 
-func init() {
+func initUtil() {
   Diec = make(chan *struct{})
 }
 
@@ -64,5 +69,43 @@ func ReadContent(request *http.Request) ([]byte, error) {
     return nil, errors.New("content length not match")
   } else {
     return data, nil
+  }
+}
+
+func OpenFile(dir, name string, create bool) (*os.File, error) {
+  filename := dir + "/" + name
+  if err := CheckDir(dir, create); err != nil {
+    return nil, err
+  }
+  if info, err := os.Stat(filename); err == nil && info.IsDir() {
+    mesg := fmt.Sprintf("%s is directory", filename)
+    return nil, errors.New(mesg)
+  } else if err != nil && !create {
+    return nil, err
+  }
+
+  flags := os.O_TRUNC | os.O_CREATE | os.O_RDWR
+  if f, err := os.OpenFile(filename, flags, MODE); err != nil {
+    return nil, err
+  } else {
+    return f, nil
+  }
+}
+
+// CheckDir check the existence of given dir, if not, create it.
+func CheckDir(dir string, create bool) error {
+  if info, err := os.Stat(dir); err != nil {
+    if create {
+      if err := os.MkdirAll(dir, MODE); err != nil {
+        return err
+      }
+      return nil
+    }
+    return err
+  } else if info.IsDir() {
+    return nil
+  } else {
+    mesg := fmt.Sprintf("%s not directory", dir)
+    return errors.New(mesg)
   }
 }

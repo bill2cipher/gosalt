@@ -1,9 +1,9 @@
 package db
 
 var (
-	SERVER_TABLE   = []byte("server")
-	TEMPLATE_TABLE = []byte("template")
-	CONFIGS_TABLE  = []byte("configs")
+	SERVER_TABLE   = "server"
+	TEMPLATE_TABLE = "template"
+	CONFIGS_TABLE  = "configs"
 
-	TABLES = [][]byte{SERVER_TABLE, TEMPLATE_TABLE, CONFIGS_TABLE}
+	TABLES = []string{SERVER_TABLE, TEMPLATE_TABLE, CONFIGS_TABLE}
 )

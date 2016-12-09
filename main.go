@@ -17,13 +17,12 @@ package main
 import (
   log "github.com/Sirupsen/logrus"
   "github.com/jellybean4/gosalt/cmd"
+  "github.com/jellybean4/order_init"
 )
 
-func init() {
-  log.SetFormatter(&log.JSONFormatter{})
-  log.SetLevel(log.WarnLevel)
-}
-
 func main() {
+  if err := order.ExecFunc(); err !=  nil {
+    log.Fatalf("execute init func failed, reason %s", err.Error())
+  }
   cmd.Execute()
 }

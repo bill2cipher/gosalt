@@ -2,7 +2,6 @@ package models
 
 import (
 	log "github.com/Sirupsen/logrus"
-  . "github.com/jellybean4/gosalt/mesg"
 	"github.com/jellybean4/gosalt/db"
 	"github.com/jellybean4/gosalt/util"
 )
@@ -11,14 +10,23 @@ var (
 	TemplateCache *Cache
 )
 
-func init() {
-	TemplateCache = NewTemplateCache()
+func initTempl() {
+  if c, err := NewTemplateCache(); err != nil {
+    log.WithFields(log.Fields{
+      "table": db.SERVER_TABLE,
+      "reason": err.Error(),
+    }).Fatal(util.CACHE_INIT_DATA_LOG)
+  } else {
+    TemplateCache = c
+  }
 }
 
 type (
 	Template struct {
-		Name   string            `json:"name"`
-		Config map[string]string `json:"config"`
+		Name    string            `json:"name"`
+		Env     string            `json:"env"`
+		Version string            `json:"version"`
+		Config  map[string]string `json:"config"`
 	}
 
 	TemplateHandler struct {
@@ -32,7 +40,7 @@ func (h *TemplateHandler) Unmarshal(data []byte) (interface{}, error) {
 		log.WithFields(log.Fields{
 			"data":   data,
 			"reason": err.Error(),
-		}).Error(JSON_UNMARSHAL_LOG)
+		}).Error(util.JSON_UNMARSHAL_LOG)
 		return nil, err
 	} else {
 		return v, nil
@@ -43,18 +51,16 @@ func (h *TemplateHandler) Key(v interface{}) (string, bool) {
 	if t, ok := v.(*Template); ok {
 		return t.Name, true
 	} else {
-    log.WithFields(log.Fields{
-      "value": v,
-      "type":  "template",
-    }).Error(TYPE_ASSERT_LOG)
+		log.WithFields(log.Fields{
+			"value": v,
+			"type":  "template",
+		}).Error(util.TYPE_ASSERT_LOG)
 		return "", false
 	}
 }
 
-func NewTemplateCache() *Cache {
+func NewTemplateCache() (*Cache, error) {
 	dftHandler := &DefaultHandler{table: db.TEMPLATE_TABLE}
 	tplHandler := &TemplateHandler{DefaultHandler: dftHandler}
-	c := NewCache(string(db.TEMPLATE_TABLE), tplHandler, true, false)
-	return c
+	return NewCache(string(db.TEMPLATE_TABLE), tplHandler, true, false)
 }
-

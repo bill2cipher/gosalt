@@ -14,7 +14,7 @@ if [ -f ${CodeDir} ] ; then
 fi
 
 # make dir CodeDir or ReleaseDir if not exist
-if [ ! -e ${CodeDir} ] ; then 
+if [ ! -e ${CodeDir} ] ; then
   mkdir -p ${CodeDir}
 fi
 
@@ -27,7 +27,7 @@ cd ${CodeDir}
 p4 sync ./...
 if [ ! $? -eq 0 ] ; then
   printf "p4 sync code failed"
-	exit 0
+	exit 1
 fi
 
 # test if it is all, if it is, convert to others
@@ -42,7 +42,7 @@ function build_release() {
   # clean release dir content if exist
   if [ -e ${ReleaseDir}/$1 ] ; then
     rm -rf ${ReleaseDir}/$1
-  fi 
+  fi
 
   rebar3 as prod release
 
@@ -63,4 +63,11 @@ function tar_release() {
 for SvrName in ${Servers[@]}; do
   build_release ${SvrName}
 done
+
+# build start script
+for SvrName in ${Servers[@]}; do
+  echo "cd ${SvrName} && ./bin/${SvrName} start && cd .."  >> start.sh
+done
+
+
 tar_release

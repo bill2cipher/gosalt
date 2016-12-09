@@ -2,6 +2,14 @@ basic:
   root_dir: /
   code_dir: /root/p4/Programe/trunc/Server
 
+saltstack:
+  minion_dir: /etc/gosalt/minion
+  templ_dir: /etc/gosalt/template
+  master: 127.0.0.1
+  master_port: 4505
+  minion_user: mgame
+  minion_root: /tmp/salt
+
 db:
   file: /etc/gosalt/db/db_file
 
@@ -22,3 +30,4 @@ log:
   name: gosalt
   maxBytes: 268435456 #256MB
   level: debug
+

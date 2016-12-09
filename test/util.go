@@ -11,6 +11,8 @@ import (
 
 import (
   . "github.com/jellybean4/gosalt/web"
+  _ "github.com/jellybean4/gosalt/cmd"
+  "github.com/jellybean4/order_init"
   "github.com/spf13/viper"
   "fmt"
   "io"
@@ -20,21 +22,20 @@ const (
   testPort = 5500
 )
 
-func initServer(t *testing.T) {
+func init() {
   viper.SetConfigFile("/tmp/gosalt/gosalt.yml")
-  viper.SetConfigName("gosalt")
-  viper.AddConfigPath("/etc/gosalt")
-  viper.AutomaticEnv()
+}
 
-  // If a config file is found, read it in.
-  if err := viper.ReadInConfig(); err != nil {
-    errMesg := fmt.Sprintf("parse config file failed, reason %s", err.Error())
-    t.Error(errMesg)
-  } else {
-    t.Log("starting server...")
-    go Serve(testPort)
-    time.Sleep(100 * time.Millisecond)
+func startInit(t *testing.T) {
+  if err := order.ExecFunc(); err != nil {
+    t.Errorf("execute init func failed, reason %s", err.Error())
   }
+}
+
+func startServer(t *testing.T) {
+  startInit(t)
+  go Serve(testPort)
+  time.Sleep(100 * time.Millisecond)
 }
 
 func request(t *testing.T, reqStruct interface{}, path string) []byte {
