@@ -4,7 +4,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/jellybean4/gosalt/db"
 	"github.com/jellybean4/gosalt/util"
-  "reflect"
+	"reflect"
+  "errors"
 )
 
 var (
@@ -13,16 +14,30 @@ var (
 
 type (
 	Config struct {
-		ID      uint   `gorm:"primary_key;AUTO_INCREMENT;column:name"`
-		Name    string `gorm:"column:name"`
-		Version string `gorm:"column:version"`
-		Config  map[string]string
+		ID      string            `bson:"_id"`
+		Name    string            `bson:"name"`
+		Version string            `bson:"version"`
+		Env     string            `bson:"env"`
+		Config  map[string]string `bson:"config"`
 	}
 
 	ConfigHandler struct {
 		*DefaultHandler
 	}
 )
+
+func (h *ConfigHandler) SetKey(v interface{}, key string) error {
+  if c, ok := v.(*Config); !ok {
+    log.WithFields(log.Fields{
+      "value": v,
+      "type": "models.Config",
+    }).Error(util.TYPE_ASSERT_LOG)
+    return errors.New(util.TYPE_ASSERT_LOG)
+  } else {
+    c.ID = key
+    return nil
+  }
+}
 
 func (h *ConfigHandler) Key(v interface{}) (string, bool) {
 	if t, ok := v.(*Template); ok {
@@ -37,7 +52,7 @@ func (h *ConfigHandler) Key(v interface{}) (string, bool) {
 }
 
 func NewConfigCache() (*Cache, error) {
-	dftHandler := &DefaultHandler{table: db.CONFIGS_TABLE, t : reflect.TypeOf(Config{})}
+	dftHandler := &DefaultHandler{table: db.CONFIGS_TABLE, t: reflect.TypeOf(Config{})}
 	cfgHandler := &ConfigHandler{DefaultHandler: dftHandler}
 	return NewCache(string(db.CONFIGS_TABLE), cfgHandler, false, true)
 }

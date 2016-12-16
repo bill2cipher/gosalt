@@ -1,9 +1,14 @@
 package models
 
 import (
+  "errors"
+)
+
+import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/jellybean4/gosalt/db"
 	"github.com/jellybean4/gosalt/util"
+  "reflect"
 )
 
 var (
@@ -11,22 +16,22 @@ var (
 )
 
 func initTempl() {
-  if c, err := NewTemplateCache(); err != nil {
-    log.WithFields(log.Fields{
-      "table": db.SERVER_TABLE,
-      "reason": err.Error(),
-    }).Fatal(util.CACHE_INIT_DATA_LOG)
-  } else {
-    TemplateCache = c
-  }
+	if c, err := NewTemplateCache(); err != nil {
+		log.WithFields(log.Fields{
+			"table":  db.SERVER_TABLE,
+			"reason": err.Error(),
+		}).Fatal(util.CACHE_INIT_DATA_LOG)
+	} else {
+		TemplateCache = c
+	}
 }
 
 type (
 	Template struct {
-		Name    string            `json:"name"`
-		Env     string            `json:"env"`
-		Version string            `json:"version"`
-		Config  map[string]string `json:"config"`
+		Name    string            `json:"name"    bson:"_id"`
+		Env     string            `json:"env"     bson:"env"`
+		Version string            `json:"version" bson:"version"`
+		Config  map[string]string `json:"config"  bson:"config"`
 	}
 
 	TemplateHandler struct {
@@ -34,17 +39,8 @@ type (
 	}
 )
 
-func (h *TemplateHandler) Unmarshal(data []byte) (interface{}, error) {
-	v := new(Template)
-	if err := util.Unmarshal(data, v); err != nil {
-		log.WithFields(log.Fields{
-			"data":   data,
-			"reason": err.Error(),
-		}).Error(util.JSON_UNMARSHAL_LOG)
-		return nil, err
-	} else {
-		return v, nil
-	}
+func (h *TemplateHandler) SetKey(v interface{}, key string) error {
+  return errors.New("server model not support")
 }
 
 func (h *TemplateHandler) Key(v interface{}) (string, bool) {
@@ -60,7 +56,7 @@ func (h *TemplateHandler) Key(v interface{}) (string, bool) {
 }
 
 func NewTemplateCache() (*Cache, error) {
-	dftHandler := &DefaultHandler{table: db.TEMPLATE_TABLE}
+	dftHandler := &DefaultHandler{table: db.TEMPLATE_TABLE, t : reflect.TypeOf(Template{})}
 	tplHandler := &TemplateHandler{DefaultHandler: dftHandler}
 	return NewCache(string(db.TEMPLATE_TABLE), tplHandler, true, false)
 }

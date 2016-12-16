@@ -1,6 +1,10 @@
 package util
 
 const (
+  UNKNOWN_ERROR_LOG = "unknown error"
+)
+
+const (
 	SUCCESS_MESG = ""
 	SUCCESS_CODE = 0
 )
@@ -22,9 +26,9 @@ const (
 
 	CACHE_DEL_DATA_LOG  = "cache del"
 	CACHE_DEL_DATA_CODE = 5
-  
-  CACHE_INIT_DATA_LOG = "cache init"
-  CACHE_INIT_DATA_CODE = 16
+
+	CACHE_INIT_DATA_LOG  = "cache init"
+	CACHE_INIT_DATA_CODE = 16
 )
 
 const (
@@ -42,9 +46,7 @@ const (
 const (
 	TEMPL_PARSE_LOG  = "template parse"
 	TEMPL_PARSE_CODE = 8
-)
 
-const (
 	TEMPL_EXEC_LOG  = "template execute"
 	TEMPL_EXEC_CODE = 9
 )
@@ -52,13 +54,10 @@ const (
 const (
 	FILE_OPEN_LOG  = "file open"
 	FILE_OPEN_CODE = 10
-)
-const (
+
 	FILE_CLOSE_LOG  = "file close"
 	FILE_CLOSE_CODE = 11
-)
 
-const (
 	FILE_DELETE_LOG  = "file delete"
 	FILE_DELETE_CODE = 12
 )
@@ -80,4 +79,17 @@ const (
 	DB_STORE_LOG  = "db store"
 	DB_DELETE_LOG = "db delete"
 	DB_ALL_LOG    = "db fetch all"
+	DB_GEN_ID     = "db gen id"
+)
+
+const (
+	RSA_GEN_LOG     = "ras gen"
+	RSA_MARSHAL_LOG = "rsa marshal"
+)
+
+const (
+	SALT_LOGIN_LOG        = "salt login"
+	SALT_EXEC_LOG         = "salt exec"
+	SALT_EVENT_LISTEN_LOG = "salt event listen"
+	SALT_EVENT_RECV_LOG   = "salt event receive"
 )

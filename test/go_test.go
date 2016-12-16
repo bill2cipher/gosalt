@@ -12,5 +12,5 @@ func TestGo(t *testing.T) {
 	A.A = 12
 	A.B = map[string]string{"good": "bad", "think": "follow"}
 	B, _ := json.Marshal(A)
-	fmt.Println("%v", B)
+	fmt.Printf("%v\n", B)
 }

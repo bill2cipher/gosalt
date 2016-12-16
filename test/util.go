@@ -24,16 +24,18 @@ const (
 
 func init() {
   viper.SetConfigFile("/tmp/gosalt/gosalt.yml")
+  startInit()
+
 }
 
-func startInit(t *testing.T) {
+func startInit() {
   if err := order.ExecFunc(); err != nil {
-    t.Errorf("execute init func failed, reason %s", err.Error())
+    mesg := fmt.Sprintf("execute init func failed, reason %s", err.Error())
+    panic(mesg)
   }
 }
 
 func startServer(t *testing.T) {
-  startInit(t)
   go Serve(testPort)
   time.Sleep(100 * time.Millisecond)
 }
@@ -47,7 +49,7 @@ func request(t *testing.T, reqStruct interface{}, path string) []byte {
   }
 
   body := bytes.NewBuffer(reqData)
-  url := fmt.Sprintf("http://192.168.2.220:%d/%s", testPort, path)
+  url := fmt.Sprintf("http://127.0.0.1:%d/%s", testPort, path)
   request, err := http.NewRequest(http.MethodPost, url, body)
   request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
   request.Header.Set("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3")

@@ -6,6 +6,8 @@ import (
 
 import (
 	"github.com/patrickmn/go-cache"
+  "strings"
+  "github.com/jellybean4/gosalt/db"
 )
 
 const (
@@ -15,16 +17,17 @@ const (
 
 type CacheHandler interface {
 	Key(v interface{}) (string, bool)        // parse key from obj
-	Get(key string) (interface{}, error)      // Get data
+	SetKey(v interface{}, key string) error              // set key for obj
+	Get(key string) (interface{}, error)     // Get data
 	Set(key string, value interface{}) error // set data
 	All() ([]interface{}, error)             // load all data
 	Delete(key string) error                 // delete data
 }
 
 type Cache struct {
-	name   string
-	c      *cache.Cache
-	h      CacheHandler
+	name string
+	c    *cache.Cache
+	h    CacheHandler
 }
 
 func NewCache(name string, h CacheHandler, load, expire bool) (*Cache, error) {
@@ -56,6 +59,7 @@ func NewCache(name string, h CacheHandler, load, expire bool) (*Cache, error) {
 }
 
 func (c *Cache) loadAll(expire bool) (items map[string]cache.Item, err error) {
+  items = make(map[string]cache.Item)
 	all, err := c.h.All()
 	now := time.Now().UnixNano()
 	if err != nil {
@@ -93,6 +97,16 @@ func (c *Cache) Delete(key string) error {
 }
 
 func (c *Cache) Set(key string, value interface{}) error {
+  if strings.Compare(key, db.EMPTY_ID) == 0 {
+    if id, err := db.GetNextID(c.name); err != nil {
+      return err
+    } else if err := c.h.SetKey(value, id); err != nil {
+      return err
+    } else {
+      key = id
+    }
+  }
+
 	if err := c.h.Set(key, value); err != nil {
 		return err
 	} else {

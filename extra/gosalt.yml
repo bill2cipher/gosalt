@@ -1,5 +1,5 @@
 basic:
-  root_dir: /
+  root_dir: /tmp/gosalt
   code_dir: /root/p4/Programe/trunc/Server
 
 saltstack:
@@ -7,11 +7,17 @@ saltstack:
   templ_dir: /etc/gosalt/template
   master: 127.0.0.1
   master_port: 4505
+  master_user: gosalt
+  master_pass: 123456
+  netapi_port: 4507
   minion_user: mgame
   minion_root: /tmp/salt
 
 db:
-  file: /etc/gosalt/db/db_file
+  name: gosalt
+  user: gosalt
+  pass: 123456
+  host: 127.0.0.1
 
 web:
   dir: /etc/gosalt/web
@@ -19,6 +25,7 @@ web:
 release:
   script: /etc/gosalt/script/release.sh
   dir   : /var/gosalt/release
+
 
 deploy:
   deploy_script: /etc/gosalt/script/deploy.sh
@@ -31,3 +38,5 @@ log:
   maxBytes: 268435456 #256MB
   level: debug
 
+config:
+  dir: /etc/gosalt/config

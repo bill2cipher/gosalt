@@ -109,3 +109,11 @@ func CheckDir(dir string, create bool) error {
     return errors.New(mesg)
   }
 }
+
+func Recover() error {
+  if err := recover(); err != nil {
+    mesg := fmt.Sprintf("%v")
+    return errors.New(mesg)
+  }
+  return nil
+}
